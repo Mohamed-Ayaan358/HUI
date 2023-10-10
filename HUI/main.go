@@ -6,6 +6,8 @@ import (
 	"log"
 	"regexp"
 	"strings"
+
+	"github.com/PuerkitoBio/goquery"
 )
 
 // Struct to represent a node in the parse tree
@@ -17,6 +19,7 @@ type Node struct {
 }
 
 var css []string
+var html []string
 
 // myDictionary := make(map[string]int)
 
@@ -89,6 +92,29 @@ func CSSextractor(CSSlines []string, CSSnum int) map[string]string {
 
 }
 
+func HTMLextractor(HTML string) {
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(HTML))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	bodySelection := doc.Find("body")
+
+	// Check if the body element exists
+	if bodySelection.Length() == 0 {
+		fmt.Println("No <body> element found in the HTML.")
+		return
+	}
+
+	// Get the HTML content of the body element
+	bodyHTML, _ := bodySelection.Html()
+
+	// Parse the body content
+	lines := strings.Split(bodyHTML, "\n")
+	fmt.Println(lines)
+
+}
+
 func Parser(text string) {
 	lines := strings.Split(text, "\n")
 
@@ -102,5 +128,12 @@ func Parser(text string) {
 				fmt.Println(key, val)
 			}
 		}
+
+		if "<body>" == trimmedLine {
+			HTMLextractor(text)
+		}
+
+		// fmt.Println(html)
 	}
+
 }
